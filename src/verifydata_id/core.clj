@@ -2,6 +2,7 @@
   (:require
    [cats.core :as m]
    [cats.monad.maybe :as maybe]
+   [clojure.string :as cstring]
    [net.cgrand.enlive-html :as html]
    )
   (:use [liberator.core :only [defresource resource]]
@@ -96,7 +97,8 @@
             {:state 'found
              :name name
              :reg-name reg-name
-             :distance (levenshtein name reg-name)}
+             :distance (levenshtein (cstring/upper-case name)
+                                    (cstring/upper-case reg-name))}
             {:state 'not-found}))))))
 
 (defroutes app
