@@ -8,4 +8,5 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [liberator "0.12.2"]
                  [compojure "1.3.3"]
+                 [http-kit "2.1.19"]
                  [ring/ring-core "1.3.2"]])
