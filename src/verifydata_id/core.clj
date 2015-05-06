@@ -2,7 +2,20 @@
   (:require [org.httpkit.client :as http])
   (:use [liberator.core :only [defresource resource]]
         [ring.middleware.params :refer [wrap-params]]
-        [compojure.core :refer [defroutes ANY]]))
+        [compojure.core :refer [defroutes ANY]]
+        [hiccup.page :only [html5]]))
+
+(defresource home
+  :available-media-types ["text/html"]
+  :handle-ok
+  (fn [ctx]
+    (let []
+      (html5 {}
+             [:head
+              [:title "Indonesian Data Verification Service"]]
+             [:body
+              "Visit /verify-nik/NIK"])
+      )))
 
 (defresource verify-nik [nik]
   :available-media-types ["text/html"]
@@ -18,6 +31,7 @@
        body)))
 
 (defroutes app
+  (ANY "/" [] home)
   (ANY "/verify-nik/:nik" [nik] (verify-nik nik)))
 
 (def handler
