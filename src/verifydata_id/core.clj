@@ -1,5 +1,7 @@
 (ns verifydata-id.core
-  (:require 
+  (:require
+   [cats.core :as m]
+   [cats.monad.maybe :as maybe]
    [net.cgrand.enlive-html :as html]
    )
   (:use [liberator.core :only [defresource resource]]
@@ -7,8 +9,19 @@
         [compojure.core :refer [defroutes ANY]]
         [hiccup.page :only [html5]]))
 
+(def ^:dynamic *base-url* "https://data.kpu.go.id/ss8.php?cmd=cari&nik=")
+
+;; Forward declarations
+(def process-kpu-response)
+
 (defn fetch-url [url]
-  (html/html-resource (java.net.URL. url)))
+  (try
+    (maybe/just (html/html-resource (java.net.URL. url)))
+    (catch Exception e (maybe/nothing))))
+
+(defn fetch-kpu-response [nik]
+  (m/mlet [data (fetch-url (str *base-url* nik))]
+    (m/return (process-kpu-response data))))
 
 (defn process-kpu-response [body]
   (let [data
@@ -32,12 +45,19 @@
   :available-media-types ["application/json"]
   :handle-ok
   (fn [_]
-    (let [data
-          (fetch-url
-           (str "https://data.kpu.go.id/ss8.php?cmd=cari&nik=" nik))
+    (let [mdata
+          (fetch-kpu-response nik)
           ]
-      (process-kpu-response data))))
-         
+      (cond
+        (= (type mdata) cats.monad.maybe.Nothing)
+        {:state 'error}
+        :else
+        (let [data (maybe/from-maybe mdata)
+              name (data "Nama:")]
+          (if name
+            {:state 'found
+             :name name}
+            {:state 'not-found}))))))
 
 (defroutes app
   (ANY "/" [] home)
