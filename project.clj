@@ -8,6 +8,6 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [liberator "0.12.2"]
                  [compojure "1.3.3"]
+                 [enlive "1.1.5"]
                  [hiccup "1.0.5"]
-                 [http-kit "2.1.19"]
                  [ring/ring-core "1.3.2"]])

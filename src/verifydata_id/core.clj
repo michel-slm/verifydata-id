@@ -1,9 +1,20 @@
 (ns verifydata-id.core
-  (:require [org.httpkit.client :as http])
+  (:require 
+   [net.cgrand.enlive-html :as html]
+   )
   (:use [liberator.core :only [defresource resource]]
         [ring.middleware.params :refer [wrap-params]]
         [compojure.core :refer [defroutes ANY]]
         [hiccup.page :only [html5]]))
+
+(defn fetch-url [url]
+  (html/html-resource (java.net.URL. url)))
+
+(defn process-kpu-response [body]
+  (let [data
+        (map html/text
+             (html/select body [:form :div.form :span]))]
+    (into {} (map vec (partition 2 data)))))
 
 (defresource home
   :available-media-types ["text/html"]
@@ -18,17 +29,15 @@
       )))
 
 (defresource verify-nik [nik]
-  :available-media-types ["text/html"]
+  :available-media-types ["application/json"]
   :handle-ok
-  #(let [media-type
-         (get-in % [:representation :media-type])
-         {:keys [status headers body error] :as resp}
-         @(http/get
+  (fn [_]
+    (let [data
+          (fetch-url
            (str "https://data.kpu.go.id/ss8.php?cmd=cari&nik=" nik))
-         ]
-     (if error
-       (format "Failed, exception: %s" error)
-       body)))
+          ]
+      (process-kpu-response data))))
+         
 
 (defroutes app
   (ANY "/" [] home)
