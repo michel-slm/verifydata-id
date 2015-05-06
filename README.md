@@ -1,5 +1,7 @@
 # verifydata-id
 
+[![Build Status](https://travis-ci.org/michel-slm/verifydata-id.svg)](https://travis-ci.org/michel-slm/verifydata-id)
+
 A Clojure web service for verifying identities against various
 Indonesian governmental data sources. Currently implements identity
 card verification against the data held by the electoral commission.
