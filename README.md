@@ -8,7 +8,10 @@ card verification against the data held by the electoral commission.
 
 ## Usage
 
-lein ring server
+* Install [Leiningen](https://github.com/technomancy/leiningen#installation)
+* lein ring server
+* curl -i http://localhost:3000/verify-nik/:nik
+* curl -i http://localhost:3000/verify-nik-name/:nik/:name
 
 ## License
 
