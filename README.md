@@ -1,14 +1,16 @@
 # verifydata-id
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure web service for verifying identities against various
+Indonesian governmental data sources. Currently implements identity
+card verification against the data held by the electoral commission.
 
 ## Usage
 
-FIXME
+lein ring server
 
 ## License
 
-Copyright © 2015 FIXME
+Copyright © 2015 Michel Alexandre Salim
 
-Distributed under the Eclipse Public License either version 1.0 or (at
+Distributed under the Apache Software License, either version 2.0 or (at
 your option) any later version.
