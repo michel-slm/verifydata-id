@@ -50,6 +50,39 @@
              (html/select body [:form :div.form :span]))]
     (into {} (map vec (partition 2 data)))))
 
+(defn verify-nik-fn [nik]
+  (let [mdata
+        (fetch-kpu-response nik)
+        ]
+    (cond
+      (= (type mdata) cats.monad.maybe.Nothing)
+      {:state 'error}
+      :else
+      (let [data (maybe/from-maybe mdata)
+            name (data "Nama:")]
+        (if name
+          {:state 'found
+           :name name}
+          {:state 'not-found})))))
+
+(defn verify-nik-name-fn [nik name]
+  (let [mdata
+        (fetch-kpu-response nik)
+        ]
+    (cond
+      (= (type mdata) cats.monad.maybe.Nothing)
+      {:state 'error}
+      :else
+      (let [data (maybe/from-maybe mdata)
+            reg-name (data "Nama:")]
+        (if name
+          {:state 'found
+           :name name
+           :reg-name reg-name
+           :distance (levenshtein (cstring/upper-case name)
+                                  (cstring/upper-case reg-name))}
+          {:state 'not-found})))))
+
 (defresource home
   :available-media-types ["text/html"]
   :handle-ok
@@ -66,40 +99,13 @@
   :available-media-types ["application/json"]
   :handle-ok
   (fn [_]
-    (let [mdata
-          (fetch-kpu-response nik)
-          ]
-      (cond
-        (= (type mdata) cats.monad.maybe.Nothing)
-        {:state 'error}
-        :else
-        (let [data (maybe/from-maybe mdata)
-              name (data "Nama:")]
-          (if name
-            {:state 'found
-             :name name}
-            {:state 'not-found}))))))
+    (verify-nik-fn nik)))
 
-(defresource verify-nik-name [nik, name]
+(defresource verify-nik-name [nik name]
   :available-media-types ["application/json"]
   :handle-ok
   (fn [_]
-    (let [mdata
-          (fetch-kpu-response nik)
-          ]
-      (cond
-        (= (type mdata) cats.monad.maybe.Nothing)
-        {:state 'error}
-        :else
-        (let [data (maybe/from-maybe mdata)
-              reg-name (data "Nama:")]
-          (if name
-            {:state 'found
-             :name name
-             :reg-name reg-name
-             :distance (levenshtein (cstring/upper-case name)
-                                    (cstring/upper-case reg-name))}
-            {:state 'not-found}))))))
+    (verify-nik-name-fn nik name)))
 
 (defroutes app
   (ANY "/" [] home)
