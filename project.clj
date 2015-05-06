@@ -11,4 +11,6 @@
                  [compojure "1.3.3"]
                  [enlive "1.1.5"]
                  [hiccup "1.0.5"]
-                 [ring/ring-core "1.3.2"]])
+                 [ring/ring-core "1.3.2"]]
+  :global-vars {*warn-on-reflection* false}
+  )

@@ -7,3 +7,8 @@
   (testing "Test lookup against downed KPU server"
     (with-redefs [fetch-url (fn [url] (maybe/nothing))]
       (is (= (verify-nik-fn 42) {:state 'error})))))
+
+(deftest normalize-name-test
+  (testing "Test name normalization"
+    (is (= (normalize-name " G I T O 42! ")
+           (normalize-name "gito")))))

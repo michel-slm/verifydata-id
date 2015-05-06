@@ -2,7 +2,6 @@
   (:require
    [cats.core :as m]
    [cats.monad.maybe :as maybe]
-   [clojure.string :as cstring]
    [net.cgrand.enlive-html :as html]
    )
   (:use [liberator.core :only [defresource resource]]
@@ -44,6 +43,12 @@
            (assoc! prev-col i (get col i)))) ; 
        (last (persistent! col)))))) ; last element of last column
 
+(defn normalize-name [^String name]
+  (apply str
+         (filter (fn [^Character ch]
+                   (Character/isLetter ch))
+                 (.toUpperCase name))))
+
 (defn process-kpu-response [body]
   (let [data
         (map html/text
@@ -79,8 +84,8 @@
           {:state 'found
            :name name
            :reg-name reg-name
-           :distance (levenshtein (cstring/upper-case name)
-                                  (cstring/upper-case reg-name))}
+           :distance (levenshtein (normalize-name name)
+                                  (normalize-name reg-name))}
           {:state 'not-found})))))
 
 (defresource home
